@@ -4,15 +4,16 @@
 
 ## Proxying a subset of paths to another server
 ```sh
-docker network create demo
+docker network create public
+docker network create private
 
 # build and run server
 docker build -t server -f server/Dockerfile ./server
-docker run --rm -p 8081:80 --network demo --name server server
+docker run --rm -p 8081:80  --network private --name server server
 
 # build and run proxy
 docker build -t proxy -f proxy/Dockerfile ./proxy
-docker run --rm -p 8080:80 --network demo --name proxy proxy
+docker run --rm -p 8080:80 --network public --network private --name proxy proxy
 ```
 
 ### Generating a http basic username and password
@@ -29,5 +30,5 @@ curl http://localhost:8080/does_not_exist.html  # Hits the proxy returns 404 bec
 curl http://localhost:8080/public.html          # Hits the proxy and is forwarded to the server
 curl http://localhost:8080/private.html         # Hits the proxy and not found on the local file system so returns 404
 curl http://localhost:8080/secure.html          # Hits the proxy, requests basic auth per `.htpassed` and is forwarded to the server
-curl -u user@example.com:password http://localhost:8080/secure.html
+curl -u user@example.com:password http://localhost:8080/secure.html # this time supply credentials
 ```
