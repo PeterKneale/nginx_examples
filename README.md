@@ -7,11 +7,11 @@
 docker network create public
 docker network create private
 
-# build and run server
+# build and run server (on the private network)
 docker build -t server -f server/Dockerfile ./server
 docker run --rm -p 8081:80  --network private --name server server
 
-# build and run proxy
+# build and run proxy (on the public and private networks)
 docker build -t proxy -f proxy/Dockerfile ./proxy
 docker run --rm -p 8080:80 --network public --network private --name proxy proxy
 ```
